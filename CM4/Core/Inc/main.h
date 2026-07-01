@@ -63,8 +63,22 @@ void Error_Handler(void);
 #define OSC_IN_GPIO_Port GPIOH
 
 /* USER CODE BEGIN Private defines */
-
+/* I2C1 / CTP Touchscreen GPIO pins */
+#define I2C1_SCL_CTP_HAPTIC_Pin       GPIO_PIN_6
+#define I2C1_SCL_CTP_HAPTIC_GPIO_Port GPIOB
+#define I2C1_SDA_CTP_HAPTIC_Pin       GPIO_PIN_7
+#define I2C1_SDA_CTP_HAPTIC_GPIO_Port GPIOB
+#define CTP_RST_Pin                   GPIO_PIN_14
+#define CTP_RST_GPIO_Port             GPIOC
+#define CTP_INT_Pin                   GPIO_PIN_3
+#define CTP_INT_GPIO_Port             GPIOH
+#define CTP_INT_EXTI_IRQn             EXTI3_IRQn
 /* USER CODE END Private defines */
+
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
+void MX_I2C1_Init(void);
+void MX_DMA2D_Init(void);
 
 #ifdef __cplusplus
 }

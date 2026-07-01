@@ -22,7 +22,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "dma2d.h"
+#include "i2c.h"
+#include "lvgl/lvgl.h"
+#include "lvgl/demos/lv_demos.h"
+#include "lvgl_port_touch.h"
+#include "lvgl_port_display.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,6 +106,19 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_MDMA_Init();
   /* USER CODE BEGIN 2 */
+  MX_I2C1_Init();
+  MX_DMA2D_Init();
+
+  /* initialize LVGL framework */
+  lv_init();
+  lv_tick_set_cb(HAL_GetTick);
+
+  /* initialize display and touchscreen */
+  lvgl_display_init();
+  lvgl_touchscreen_init();
+
+  /* lvgl demo */
+  lv_demo_widgets();
 
   /* USER CODE END 2 */
 
@@ -108,6 +126,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    lv_timer_handler();
+    HAL_Delay(5);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

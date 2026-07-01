@@ -42,10 +42,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lvgl/lvgl.h"
-#include "lvgl/demos/lv_demos.h"
-#include "lvgl_port_touch.h"
-#include "lvgl_port_display.h"
 
 /* USER CODE END Includes */
 
@@ -133,21 +129,7 @@ int main(void)
 /* Configure the peripherals common clocks */
   PeriphCommonClock_Config();
 /* USER CODE BEGIN Boot_Mode_Sequence_2 */
-/* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
-HSEM notification */
-/*HW semaphore Clock enable*/
-__HAL_RCC_HSEM_CLK_ENABLE();
-/*Take HSEM */
-HAL_HSEM_FastTake(HSEM_ID_0);
-/*Release HSEM in order to notify the CPU2(CM4)*/
-HAL_HSEM_Release(HSEM_ID_0,0);
-/* wait until CPU2 wakes up from stop mode */
-timeout = 0xFFFF;
-while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
-if ( timeout < 0 )
-{
-Error_Handler();
-}
+/* Cortex-M4 boot release moved after peripheral initialization to prevent race conditions accessing uninitialized SDRAM */
 /* USER CODE END Boot_Mode_Sequence_2 */
 
   /* USER CODE BEGIN SysInit */
@@ -157,12 +139,10 @@ Error_Handler();
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_MDMA_Init();
-  MX_I2C1_Init();
   MX_LTDC_Init();
   MX_USART1_UART_Init();
   MX_I2C4_Init();
   MX_DAC1_Init();
-  MX_DMA2D_Init();
   MX_FDCAN1_Init();
   MX_FDCAN2_Init();
   MX_SPI1_Init();
@@ -188,19 +168,18 @@ Error_Handler();
   MX_ADC3_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+  /* Release Cortex-M4 now that system peripherals and SDRAM are ready */
+  __HAL_RCC_HSEM_CLK_ENABLE();
+  HAL_HSEM_FastTake(HSEM_ID_0);
+  HAL_HSEM_Release(HSEM_ID_0, 0);
 
-  /* initialize LVGL framework */
-  lv_init();
-  lv_tick_set_cb(HAL_GetTick);
-
-  /* initialize display and touchscreen */
-  lvgl_display_init();
-  lvgl_touchscreen_init();
-
-  /* lvgl demo */
-  lv_demo_widgets();
-  //lv_demo_music();
-  //lv_demo_benchmark();
+  /* Wait until CPU2 wakes up from stop mode */
+  timeout = 0xFFFF;
+  while ((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
+  if (timeout < 0)
+  {
+    Error_Handler();
+  }
 
   /* pwm */
   if (HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_1) != HAL_OK)
