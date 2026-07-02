@@ -20,9 +20,8 @@ def main():
         source_dir = os.path.join(PROJECT_ROOT, "EEZ_Output")
 
     if not os.path.exists(source_dir):
-        print(f"Error: Source directory '{source_dir}' does not exist.")
-        print("Usage: python3 port_eez_ui.py [path_to_eez_studio_output_src]")
-        sys.exit(1)
+        print(f"Source directory '{source_dir}' does not exist. Creating it...")
+        os.makedirs(source_dir, exist_ok=True)
 
     print(f"Porting EEZ Studio project from: {source_dir}")
     print(f"Target UI directory: {TARGET_SRC_DIR}")
