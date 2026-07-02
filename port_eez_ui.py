@@ -16,8 +16,12 @@ def main():
     if len(sys.argv) > 1:
         source_dir = sys.argv[1]
     else:
-        # Default to a folder relative to project root
-        source_dir = os.path.join(PROJECT_ROOT, "EEZ_Output")
+        # Check if user generated code in default eez project path first
+        default_project_path = os.path.join(PROJECT_ROOT, "EEZ/Riverdi-template/src/ui")
+        if os.path.exists(default_project_path) and any(f.endswith('.c') for f in os.listdir(default_project_path)):
+            source_dir = default_project_path
+        else:
+            source_dir = os.path.join(PROJECT_ROOT, "EEZ_Output")
 
     if not os.path.exists(source_dir):
         print(f"Source directory '{source_dir}' does not exist. Creating it...")
@@ -26,20 +30,24 @@ def main():
     print(f"Porting EEZ Studio project from: {source_dir}")
     print(f"Target UI directory: {TARGET_SRC_DIR}")
 
-    # 2. Re-create target folder
-    if os.path.exists(TARGET_SRC_DIR):
-        shutil.rmtree(TARGET_SRC_DIR)
-    os.makedirs(TARGET_SRC_DIR)
-
-    # 3. Copy all .c and .h files recursively
     c_files = []
-    for root_dir, dirs, files in os.walk(source_dir):
-        for file in files:
-            if file.endswith((".c", ".h")):
-                src_path = os.path.join(root_dir, file)
-                # Keep folder structure flat under target
-                dest_path = os.path.join(TARGET_SRC_DIR, file)
-                shutil.copy2(src_path, dest_path)
+    if os.path.abspath(source_dir) != os.path.abspath(TARGET_SRC_DIR):
+        if os.path.exists(TARGET_SRC_DIR):
+            shutil.rmtree(TARGET_SRC_DIR)
+        os.makedirs(TARGET_SRC_DIR, exist_ok=True)
+
+        for root_dir, dirs, files in os.walk(source_dir):
+            for file in files:
+                if file.endswith((".c", ".h")):
+                    src_path = os.path.join(root_dir, file)
+                    dest_path = os.path.join(TARGET_SRC_DIR, file)
+                    shutil.copy2(src_path, dest_path)
+                    if file.endswith(".c"):
+                        c_files.append(file)
+    else:
+        # Just scan the target directory directly
+        if os.path.exists(TARGET_SRC_DIR):
+            for file in os.listdir(TARGET_SRC_DIR):
                 if file.endswith(".c"):
                     c_files.append(file)
 
@@ -97,6 +105,11 @@ def generate_subdir_mk(c_files):
     if c_deps_lines:
         c_deps_lines[-1] = c_deps_lines[-1].rstrip(" \\")
 
+    c_srcs_str = "\n".join(c_srcs_lines)
+    objs_str = "\n".join(objs_lines)
+    c_deps_str = "\n".join(c_deps_lines)
+    rules_str = "\n".join(rules_lines)
+
     content = f"""################################################################################
 # Automatically-generated file. Do not edit!
 # Toolchain: GNU Tools for STM32 (14.3.rel1)
@@ -104,17 +117,17 @@ def generate_subdir_mk(c_files):
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \\
-{"\n".join(c_srcs_lines)}
+{c_srcs_str}
 
 OBJS += \\
-{"\n".join(objs_lines)}
+{objs_str}
 
 C_DEPS += \\
-{"\n".join(c_deps_lines)}
+{c_deps_str}
 
 
 # Each subdirectory must supply rules for building sources it contributes
-{"\n".join(rules_lines)}
+{rules_str}
 
 clean: clean-Application-2f-User-2f-Core-2f-eez_ui
 

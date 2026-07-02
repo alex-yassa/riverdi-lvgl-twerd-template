@@ -3,6 +3,7 @@
 all: cm4 cm7
 
 cm4:
+	python3 port_eez_ui.py
 	$(MAKE) -C STM32CubeIDE/CM4/Release all
 
 cm7:
