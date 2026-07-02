@@ -51,6 +51,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c</locationURI>
 		</link>
 		<link>
+			<name>Drivers/STM32H7xx_HAL_Driver/stm32h7xx_hal_dma2d.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma2d.c</locationURI>
+		</link>
+		<link>
 			<name>Drivers/STM32H7xx_HAL_Driver/stm32h7xx_hal_dma_ex.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c</locationURI>
@@ -146,9 +151,9 @@
 			<locationURI>PARENT-2-PROJECT_LOC/CM4/Core/Src/stm32h7xx_it.c</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/LVGL</name>
+			<name>Middlewares/lvgl</name>
 			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/LVGL</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/lvgl</locationURI>
 		</link>
 		<link>
 			<name>Application/User/Core/dma2d.c</name>
@@ -161,14 +166,8 @@
 			<locationURI>PARENT-2-PROJECT_LOC/CM4/Core/Src/i2c.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/Core/lvgl_port_display.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/CM4/Core/Src/lvgl_port_display.c</locationURI>
-		</link>
-		<link>
 			<name>Application/User/Core/lvgl_port_touch.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/CM4/Core/Src/lvgl_port_touch.c</locationURI>
-		</link>
 	</linkedResources>
 </projectDescription>

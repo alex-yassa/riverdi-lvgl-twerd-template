@@ -25,9 +25,8 @@
 #include "dma2d.h"
 #include "i2c.h"
 #include "lvgl/lvgl.h"
-#include "lvgl/demos/lv_demos.h"
+#include "porting/lv_port_disp.h"
 #include "lvgl_port_touch.h"
-#include "lvgl_port_display.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,14 +110,20 @@ int main(void)
 
   /* initialize LVGL framework */
   lv_init();
-  lv_tick_set_cb(HAL_GetTick);
 
   /* initialize display and touchscreen */
-  lvgl_display_init();
+  lv_port_disp_init();
   lvgl_touchscreen_init();
 
-  /* lvgl demo */
-  lv_demo_widgets();
+  /* Create dark blue background and centered label with text 'TWERD ENERGO-PLUS' */
+  lv_obj_t * scr = lv_scr_act();
+  lv_obj_set_style_bg_color(scr, lv_color_hex(0x00003B), LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
+
+  lv_obj_t * label = lv_label_create(scr);
+  lv_label_set_text(label, "TWERD ENERGO-PLUS");
+  lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
   /* USER CODE END 2 */
 
@@ -126,7 +131,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* Let LVGL process timer-driven widget rendering & interactions */
     lv_timer_handler();
+
+    /* Increment the tick counter by 5ms */
+    lv_tick_inc(5);
+
+    /* Delay for 5ms to maintain visual update frequency and limit bus contention */
     HAL_Delay(5);
     /* USER CODE END WHILE */
 

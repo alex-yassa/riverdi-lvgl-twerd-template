@@ -31,11 +31,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Middlewares/LVGL</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Middlewares/Third_Party/LVGL</locationURI>
-		</link>
-		<link>
 			<name>Utilities/jpeg_utils.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Utilities/JPEG/jpeg_utils.c</locationURI>
@@ -435,16 +430,7 @@
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/CM7/Core/Src/ltdc.c</locationURI>
 		</link>
-		<link>
-			<name>Application/User/Core/lvgl_port_display.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/CM7/Core/Src/lvgl_port_display.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/Core/lvgl_port_touch.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/CM7/Core/Src/lvgl_port_touch.c</locationURI>
-		</link>
+
 		<link>
 			<name>Application/User/Core/main.c</name>
 			<type>1</type>
