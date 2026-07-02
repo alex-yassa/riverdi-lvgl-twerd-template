@@ -27,6 +27,9 @@ graph TD
     E <--> |SRAM3 Shared Memory + HSEM| J
 ```
 
+> [!TIP]
+> You can open the interactive architectural schema visually using the [Project_Template_Architecture.drawio](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/Docs/Project_Template_Architecture.drawio) file in Draw.io or using the VS Code Draw.io Integration extension.
+
 ### Cortex-M7 (CM7) — Calculations & Communications
 The CM7 acts as the master processor. Its primary duties include:
 - Configuring system clocks and power domains.
