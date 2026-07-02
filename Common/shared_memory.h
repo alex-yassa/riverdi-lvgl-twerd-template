@@ -47,7 +47,12 @@ typedef enum {
   ACCESS_LEVEL_ADMIN = 2
 } AccessLevel_t;
 
-/* Helper macros for accessing the shared buffer pointer */
+/* Helper macros for accessing the shared buffer pointer.
+ * On the PC Simulator (PC_SIMULATOR=1) this macro is supplied via CMake
+ * target_compile_definitions, pointing to the mock struct in pc_simulator_hw.c.
+ * On the real STM32H7 target it maps directly to the SRAM3 hardware address. */
+#ifndef PC_SIMULATOR
 #define SHARED_BUFFER             ((volatile SharedBuffer_t *)SHARED_SRAM_ADDR)
+#endif
 
 #endif /* SHARED_MEMORY_H */

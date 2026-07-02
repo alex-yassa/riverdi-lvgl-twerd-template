@@ -78,26 +78,35 @@ The development pipeline supports visual UI drafting inside **EEZ Studio** and c
 
 ```mermaid
 graph LR
-    A[Design in EEZ Studio] -->|Generate Code| B[EEZ_Output Folder]
-    B -->|port_eez_ui.py| C[CM4 Core/Src/eez_ui]
-    C -->|Docker Compose| D[Compile Firmware]
+    A[Design in EEZ Studio] -->|Generate Code| B[CM4/Core/Src/eez_ui]
+    B -->|Simulator: Build+Run| C[PC Simulator ✅ Fast]
+    B -->|Docker: Build| D[Compile Firmware]
     D -->|ST-Link CLI| E[Flash STM32H7 Board]
 ```
 
 ### 1 — Design & Generate Code (EEZ Studio)
 1. Open the project HMI visual file: [EEZ/Riverdi-template/Riverdi-template.eez-project](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/EEZ/Riverdi-template/Riverdi-template.eez-project).
 2. Make your UI adjustments (widgets, variables, events).
-3. Generate the output files (`Ctrl+Shift+G`). The UI files will be written to `EEZ_Output`.
+3. Generate the output files (`Ctrl+Shift+G`). With the project configured to output directly to `CM4/Core/Src/eez_ui`, files are ready immediately.
 
-### 2 — Port HMI into Build Environment
-Run the automatic porting script to clean the old assets, copy new files, and rebuild the internal makefile structures:
+### 2 — Test on the PC Simulator (Recommended first step)
+Before flashing hardware, iterate visually on the Linux host using the built-in SDL2 simulator:
 ```bash
-python3 port_eez_ui.py
+# Prerequisites (one-time)
+sudo apt-get install libsdl2-dev
+
+# Build simulator inside the Docker container
+export UID GID=$(id -g)
+docker compose run --rm builder bash -c \
+    'cmake -B pc_simulator/build -S pc_simulator && make -C pc_simulator/build -j$(nproc)'
+
+# Run natively on the host
+./pc_simulator/build/lvgl_simulator
 ```
-*(The script dynamically detects its directory structure, making it fully portable).*
+The simulator opens a pixel-perfect **1024×600** window of the LVGL UI. Navigate with Arrow keys, Enter, and Escape.
 
 ### 3 — Build inside Docker Container
-The toolchain is containerized so that no local compiler installation is needed. Build the firmware using:
+The toolchain is containerized so that no local compiler installation is needed:
 ```bash
 # Build both CM4 and CM7 cores
 docker compose run --rm builder make all
@@ -124,13 +133,17 @@ All development commands are mapped to VS Code Tasks inside `.vscode/tasks.json`
 
 | Task | Action |
 |---|---|
+| `Simulator: Build (Docker)` | Compile the SDL2 PC simulator binary |
+| `Simulator: Run (Host)` | Launch the 1024×600 simulator window on your desktop |
+| `Simulator: Build & Run` | Build then immediately launch (one shot) |
+| `Simulator: Clean` | Remove `pc_simulator/build/` |
 | `Docker: Build CM4` | Compile Cortex-M4 firmware |
 | `Docker: Build CM7` | Compile Cortex-M7 firmware |
 | `Docker: Build All (CM4 + CM7)` | Compile both cores simultaneously |
-| `Docker: Clean` | Clean all build outputs |
+| `Docker: Clean` | Clean all ARM build outputs |
 | `Flash: CM4` | Flash Cortex-M4 and trigger soft reset |
 | `Flash: CM7` | Flash Cortex-M7 and trigger soft reset |
-| `Flash: Both (CM7 then CM4 + reset)` | Sequence flash for both cores and reset the board |
+| `Flash: Both (CM7 then CM4 + reset)` | Flash both cores and reset the board |
 
 ---
 
@@ -155,9 +168,15 @@ All development commands are mapped to VS Code Tasks inside `.vscode/tasks.json`
 │
 ├── Middlewares/          # Third-party libraries (LVGL v8, FreeRTOS, FatFS)
 │
+├── pc_simulator/         # Native x86_64 PC Simulator (SDL2)
+│   ├── CMakeLists.txt    # CMake build config for the simulator target
+│   ├── main.c            # Simulator entry point (mirrors CM4 main loop)
+│   ├── sdl_port.c/h      # SDL2 display flush + keypad LVGL drivers
+│   └── pc_simulator_hw.c # Mock hardware / shared memory stubs
+│
 ├── STM32CubeIDE/         # IDE configurations and Linker files
 │
-├── docker-compose.yml    # GCC compiler service container configuration
+├── docker-compose.yml    # GCC + SDL2 compiler service container configuration
 └── port_eez_ui.py        # Automation script to port generated EEZ UI files
 ```
 

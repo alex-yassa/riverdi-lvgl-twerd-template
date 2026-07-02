@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     ninja-build \
     python3 \
+    pkg-config \
+    # SDL2 for PC simulator (native x86_64 target)
+    libsdl2-dev \
     # GNU Arm Embedded Toolchain and C Library stubs for Cortex-M
     gcc-arm-none-eabi \
     libnewlib-arm-none-eabi \

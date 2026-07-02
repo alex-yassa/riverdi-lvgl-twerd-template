@@ -139,27 +139,46 @@ clean-Application-2f-User-2f-Core-2f-eez_ui:
     with open(SUBDIR_MK_PATH, "w") as f:
         f.write(content)
 
+def _collect_all_objs_from_subdirs():
+    """Parse OBJS += entries from all subdir.mk files in the Release tree."""
+    import re
+    objs = []
+    for mk in glob.glob(RELEASE_DIR + '/**/subdir.mk', recursive=True):
+        with open(mk) as f:
+            content = f.read()
+        in_objs = False
+        for line in content.splitlines():
+            stripped = line.strip()
+            if re.match(r'^OBJS\s*\+=', stripped):
+                in_objs = True
+                continue
+            if in_objs:
+                cleaned = stripped.rstrip('\\').strip()
+                if re.match(r'^\./.+\.o$', cleaned):
+                    objs.append(cleaned)
+                if not stripped.endswith('\\'):
+                    in_objs = False
+    return list(dict.fromkeys(objs))  # deduplicate, preserve order
+
 def update_objects_list(c_files):
     objects_file = os.path.join(RELEASE_DIR, "objects.list")
-    if not os.path.exists(objects_file):
-        return
 
-    with open(objects_file, "r") as f:
-        lines = f.readlines()
+    # Always rebuild from subdir.mk files — they are the authoritative source.
+    # This is safe whether the file exists or not (e.g. after a manual clean).
+    all_objs = _collect_all_objs_from_subdirs()
 
-    # Filter out any existing eez_ui entries
-    new_lines = [l for l in lines if "eez_ui/" not in l]
+    # Remove any stale eez_ui entries; they will be added fresh below
+    all_objs = [o for o in all_objs if 'eez_ui/' not in o]
 
-    # Append new entries
-    for f in sorted(c_files):
-        obj_name = f.replace(".c", ".o")
-        new_lines.append(f'"./Application/User/Core/eez_ui/{obj_name}"\n')
+    # Append fresh eez_ui entries
+    for fname in sorted(c_files):
+        obj_name = fname.replace(".c", ".o")
+        all_objs.append(f'./Application/User/Core/eez_ui/{obj_name}')
 
-    # Remove any extra empty lines and save
-    new_lines = [l for l in new_lines if l.strip()]
     with open(objects_file, "w") as f:
-        f.writelines(sorted(list(set(new_lines))))
-    print(f"Updated {objects_file}")
+        f.write(' '.join(all_objs))
+    print(f"Updated {objects_file} ({len(all_objs)} objects)")
+
 
 def update_sources_mk():
     sources_file = os.path.join(RELEASE_DIR, "sources.mk")
