@@ -1,98 +1,158 @@
-# LVGL ported to the 7-inch Riverdi STM32 Embedded Displays (STM32H757XIH6)
+# Riverdi STM32H7 7.0” Dual-Core LVGL & EEZ HMI Template
 
-## Overview
+This repository is a premium, fully-decoupled **Dual-Core HMI template project** for the **Riverdi STM32 Embedded 7.0” Displays** (powered by the dual-core **STM32H757XIH6** MCU).
 
-STM32 Embedded 7.0” display is all-in-one complete and open-platform solution being able to independently handle the visual layer of devices with the need for high computing performance. The STM32 Embedded Displays series are industrial-quality LCD-TFT solutions based on the STM32H757XIH6 microcontroller. It has been designed in a way that allows to meet most of the hardware and programming challenges faced by engineers, including access to all interfaces.
+It decouples HMI rendering from main system tasks:
+- **Cortex-M7 (480 MHz)**: Reserved exclusively for calculations, RTOS scheduler, communications, and background control loops.
+- **Cortex-M4 (240 MHz)**: Dedicated entirely to visual rendering (LVGL graphics engine, DMA2D Chrom-ART acceleration, and touch panel polling).
 
-## Benchmark
+---
 
-In the video partial buffering was used with 1/10 screen sized buffers. The rendered images are copied to te frame buffer wit DMA2D without VSYNC, therefore sometearing is visible in some tests.
+## 🏗️ Dual-Core Decoupled Architecture
 
-[![Riverdi 7-inch STM32-cover](https://github.com/lvgl/lv_port_riverdi_70-stm32h7/assets/7599318/b136cadf-32c3-405c-8082-6613c99aedec)
-](https://www.youtube.com/watch?v=IB9t2JLPlI0)
+The template isolates visual cycles to guarantee deterministic performance for time-critical calculations and communications on the Cortex-M7:
 
-## Buy
-
-You can purchase the 7-inch Riverdi STM32 Embedded Displays from several sources:
-
-- [Riverdi's website](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-optical-bonding-uxtouch-stm32h7-rvt70hssnwc00-b)
-- [Mouser](https://www.mouser.com/c/?q=RVT70HSS)
-- [TME](https://www.tme.com/us/en-us/katalog/?queryPhrase=RVT70HSSNWC00-B) 
-
-## Benchmark
-
-### Buffer configuration
-For the best performance the example is configured for 16-bit RGB565 color format, although the native color format of the panel is RGB888. The project uses LVGL's `LV_DISPLAY_RENDER_MODE_PARTIAL` mode with two 60 line (1/10th of the height of the screen) buffers. A single buffer requires 120kB memory.
-
-If more memory is needed for the application, a single buffer may be used, or the size of the buffer can be reduced. There is no strict rule for the optimum buffer size, as it depends on many factors (screen size, screen content, processor speed, RAM speed, type of the LCD interface). In practice a 1/10th screen size buffer is a good compromise between performance and memory use, but this is an area for potential optimization, depending on the application.
-
-The board can also handle 32-bit ARGB8888 format rendering, but the performance will be lower.
-
-Direct mode rendering seems to be not feasible on this board, because in direct mode the color format must be the native format -- i.e., ARGB8888 --, and apparently the SDRAM memory is not fast enough for two full sized 32-bit buffers.
-
-The buffer configuration can be found in the file [lv_port_riverdi_70-stm32h7/CM7/Core/Src/lvgl_port_display.c](https://github.com/lvgl/lv_port_riverdi_70-stm32h7/blob/master/CM7/Core/Src/lvgl_port_display.c).
-
-[![image](https://github.com/lvgl/lv_port_riverdi_70-stm32h7/assets/7599318/88fd9a26-ec84-4f7b-98e8-313cf6a2568f)](![image](https://github.com/lvgl/lv_port_riverdi_70-stm32h7/assets/7599318/cad4801b-928b-4b11-bb2a-8f987625acc9))
-
-## Specification
-### CPU and memory
-
-- **MCU** STM32H757XIH6 (Cortex-M7 + M4 core, 480MHz)
-- **RAM** 1MB internal, 8MB external (32 bit access)
-- **Flash** 2MB internal, 64MB external flash
-- **GPU** Chrom-ART (DMA2D)
-
-### Display
-
-- **Resolution** 1024x600
-- **Display size** 7"
-- **Interface** MIPI
-- **Color depth** 24bit
-- **Technology** IPS
-- **DPI** 170 px/inch
-- **Touch pad** Industrial Capacitive or no touch
-
-### Others
-
-- RS485, RS232
-- Expansion connector (40 GPIOs to access 2x I2C, 1x UART, 1x USART, 1x SPI, 1x USB, 7x PWMs, 2x DACs, 2x ADCs)
-- 2x CAN FD
-- RiBUS connector
-- USB
-- Haptic feedback driver output (DRV2605L)
-
-## Getting started
-To be able to flash and debug your program you will need to purchase an SWD debug probe which supports the ARM Cortex-M7 core, e.g the STMicro ST-Link V2/V3 or the Segger J-Link.
-
-### Hardware setup
-- Connect a 6-48V power supply to the POWER header on the board using the supplied cable. The board draws about 0.55A at 9V.
-- Connect a debug probe to the SWD header using the supplied cable.
-  
-### Software setup
-- Install [STM32 CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) with processor support for the STM32H757XIH6.
-
-### Run the project
-- Clone the project: `git clone --recursive https://github.com/lvgl/lv_port_riverdi_70-stm32h7`
-- Open *STM32CubeIDE* and import project:` File => Open Projects from File System... => Directory => Select the "riverdi-70-stm32h7-lvgl/STM32CubeIde" folder => Finish`
-- In the Project Explorer open the `riverdi-70-stm32h7-lvgl` folder, and select `riverdi-70-stm32h7-lvgl_CM7` subproject.
-- Build the project (for the best performance use *Release* configuration with *-O2* flag): `Project => Build Project`
-- Click the ![image](https://github.com/lvgl/lv_port_riverdi_70-stm32h7/assets/7599318/ad1ba904-f917-4e0c-97b3-1c1ca12cf185) Run button to flash the project
+```mermaid
+graph TD
+    subgraph Cortex-M7 [Cortex-M7 Core - 480 MHz]
+        A[Boot & System Init] --> B[FMC SDRAM & LTDC Init]
+        B --> C[Release CM4 Core]
+        C --> D[FreeRTOS Task Scheduler]
+        D --> E[Math / Comms / Control Loop]
+    end
     
-### Debugging
-- After building the project click the Debug button ![image](https://github.com/lvgl/lv_port_riverdi_70-stm32h7/assets/7599318/369e95fb-dbfb-44d8-9250-0a5f3f8bfc60) to flash the project. You will need to select the correct debug probe for the first run.
+    subgraph Cortex-M4 [Cortex-M4 Core - 240 MHz]
+        F[Wait for Release HSEM] --> G[Boot]
+        G --> H[I2C1 Touch & DMA2D Init]
+        H --> I[LVGL Graphics Stack]
+        I --> J[User Interface Loop]
+    end
 
-## Notes
-This repository supports all configuration of 7-inch *Riverdi STM32 Embedded Displays*:
-- [*RVT70HSSNWC00-B*](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-optical-bonding-uxtouch-stm32h7-rvt70hssnwc00-b/) - *STM32H757XIH86, Capacitive Touch Panel, Optical bonding, uxTouch*
-- [*RVT70HSSNWC00*](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-uxtouch-stm32h7-rvt70hssnwc00/) - *STM32H757XIH86, Capacitive Touch Panel, Air bonding, uxTouch*
-- [*RVT70HSSFWCA0*](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-frame-stm32h7-rvt70hssfwca0/) - *STM32H757XIH86, Capacitive Touch Panel, Air bonding, aTouch*
-- [*RVT70HSSNWCA0*](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-stm32h7-rvt70hssnwca0/) - *STM32H757XIH86, Capacitive Touch Panel, Air bonding, aTouch*
-- [*RVT70HSSFWN00*](https://riverdi.com/product/7-inch-lcd-display-stm32h7-frame-rvt70hssfwn00/) - *STM32H757XIH86*
-- [*RVT70HSSNWN00*](https://riverdi.com/product/7-inch-lcd-display-stm32h7-rvt70hssnwn00/) - *STM32H757XIH86*
+    E <--> |SRAM3 Shared Memory + HSEM| J
+```
 
+### Inter-Processor Communication (IPC)
+* **Shared SRAM3 Memory (`0x30040000`)**: Memory block visible to both cores used to exchange telemetry (M7 $\rightarrow$ M4) and user events (M4 $\rightarrow$ M7). Defined in [Common/shared_memory.h](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/Common/shared_memory.h).
+* **Hardware Semaphores (`HSEM`)**: Prevent read-write race conditions when both cores access the shared buffer (`HSEM_ID_SHARED_MEM` / Semaphore ID 1).
 
-## Contribution and Support
+---
 
-If you find any issues with the development board feel free to open an Issue in this repository. For LVGL related issues (features, bugs, etc) please use the main [lvgl repository](https://github.com/lvgl/lvgl).
+## ⚙️ Hardware Specifications
 
-If you found a bug and found a solution too please send a Pull request. If you are new to Pull requests refer to [Our Guide](https://docs.lvgl.io/master/CONTRIBUTING.html#pull-request) to learn the basics.
+| Component | Specification | Details |
+|---|---|---|
+| **MCU** | STM32H757XIH6 | Asymmetric dual-core: Cortex-M7 (480MHz) + Cortex-M4 (240MHz) |
+| **RAM** | 9 MB | 1 MB internal SRAM + 8 MB external SDRAM (32-bit bus width) |
+| **Flash** | 66 MB | 2 MB internal + 64 MB external QSPI flash |
+| **Graphics Accelerator** | Chrom-ART (DMA2D) | Used by CM4 for high-speed hardware-accelerated GUI blitting |
+| **Display Panel** | 7.0" IPS TFT LCD | Resolution: **1024x600**, 170 DPI, 24-bit color depth |
+| **Touch Pad** | Capacitive | Connected via I2C1 touch controller |
+| **Interfaces** | Industrial standard | 2x CAN FD, RS485, RS232, USB, expansion headers |
+
+### Supported Displays & Purchase Links
+* [RVT70HSSNWC00-B](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-optical-bonding-uxtouch-stm32h7-rvt70hssnwc00-b/) — *Capacitive Touch, Optical Bonding*
+* [RVT70HSSNWC00](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-uxtouch-stm32h7-rvt70hssnwc00/) — *Capacitive Touch, Air Bonding*
+* [RVT70HSSFWCA0](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-frame-stm32h7-rvt70hssfwca0/) — *Capacitive Touch with Frame, aTouch*
+* [RVT70HSSNWCA0](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-stm32h7-rvt70hssnwca0/) — *Capacitive Touch, aTouch*
+* [RVT70HSSFWN00](https://riverdi.com/product/7-inch-lcd-display-stm32h7-frame-rvt70hssfwn00/) — *Non-touch panel with Frame*
+* [RVT70HSSNWN00](https://riverdi.com/product/7-inch-lcd-display-stm32h7-rvt70hssnwn00/) — *Non-touch panel*
+
+---
+
+## 🛠️ Integrated HMI Pipeline
+
+The development pipeline supports visual UI drafting inside **EEZ Studio** and compiling/flashing without needing a local STM32CubeIDE installation:
+
+```mermaid
+graph LR
+    A[Design in EEZ Studio] -->|Generate Code| B[EEZ_Output Folder]
+    B -->|port_eez_ui.py| C[CM4 Core/Src/eez_ui]
+    C -->|Docker Compose| D[Compile Firmware]
+    D -->|ST-Link CLI| E[Flash STM32H7 Board]
+```
+
+### 1 — Design & Generate Code (EEZ Studio)
+1. Open the project HMI visual file: [EEZ/Riverdi-template/Riverdi-template.eez-project](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/EEZ/Riverdi-template/Riverdi-template.eez-project).
+2. Make your UI adjustments (widgets, variables, events).
+3. Generate the output files (`Ctrl+Shift+G`). The UI files will be written to `EEZ_Output`.
+
+### 2 — Port HMI into Build Environment
+Run the automatic porting script to clean the old assets, copy new files, and rebuild the internal makefile structures:
+```bash
+python3 port_eez_ui.py
+```
+*(The script dynamically detects its directory structure, making it fully portable).*
+
+### 3 — Build inside Docker Container
+The toolchain is containerized so that no local compiler installation is needed. Build the firmware using:
+```bash
+# Build both CM4 and CM7 cores
+docker compose run --rm builder make all
+
+# Clean build artifacts
+docker compose run --rm builder make clean
+```
+
+### 4 — Flash the Board
+Ensure your debug probe (ST-LINK or J-Link) is connected to the board's **SWD** header and flash the firmware:
+```bash
+# Flash CM7 firmware (Flash Bank 1)
+STM32_Programmer_CLI -c port=SWD -w STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.elf -rst
+
+# Flash CM4 firmware (Flash Bank 2)
+STM32_Programmer_CLI -c port=SWD -w STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.elf -rst
+```
+
+---
+
+## 💻 VS Code Task Explorer Integration
+
+All development commands are mapped to VS Code Tasks inside `.vscode/tasks.json`. You can trigger them directly from the **Task Explorer** panel or via **Terminal $\rightarrow$ Run Task...**:
+
+| Task | Action |
+|---|---|
+| `Docker: Build CM4` | Compile Cortex-M4 firmware |
+| `Docker: Build CM7` | Compile Cortex-M7 firmware |
+| `Docker: Build All (CM4 + CM7)` | Compile both cores simultaneously |
+| `Docker: Clean` | Clean all build outputs |
+| `Flash: CM4` | Flash Cortex-M4 and trigger soft reset |
+| `Flash: CM7` | Flash Cortex-M7 and trigger soft reset |
+| `Flash: Both (CM7 then CM4 + reset)` | Sequence flash for both cores and reset the board |
+
+---
+
+## 📂 Project Structure
+
+```
+├── CM4/                  # Cortex-M4 Core C/C++ source code (HMI Engine)
+│   └── Core/
+│       ├── Inc/          # Header files
+│       └── Src/          # Core graphics, drivers, and eez_ui folder
+│
+├── CM7/                  # Cortex-M7 Core C/C++ source code (Calculations & OS)
+│   ├── Core/             # Hardware initialization, Main loop, and FreeRTOS tasks
+│   └── FATFS/            # FATFS filesystem driver mapping
+│
+├── Common/               # Code shared between both cores (Linker, Shared Memory)
+│   └── shared_memory.h   # Core-to-core IPC shared memory structure
+│
+├── Docs/                 # Guides and architectural diagrams
+│
+├── EEZ/                  # EEZ Studio visual project files
+│
+├── Middlewares/          # Third-party libraries (LVGL v8, FreeRTOS, FatFS)
+│
+├── STM32CubeIDE/         # IDE configurations and Linker files
+│
+├── docker-compose.yml    # GCC compiler service container configuration
+└── port_eez_ui.py        # Automation script to port generated EEZ UI files
+```
+
+---
+
+## 📖 Additional Documentation
+For deep-dives into specific topics, read our detailed guides:
+* [Docs/Project_Template_Architecture.md](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/Docs/Project_Template_Architecture.md) — Technical details of memory regions and HSEM semaphores.
+* [Docs/UI_Developing_Pipeline.md](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/Docs/UI_Developing_Pipeline.md) — Complete guide on connecting visual button actions to C callbacks.
+* [Docs/Build_and_Flash_CLI.md](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/Docs/Build_and_Flash_CLI.md) — CLI commands reference.
+* [Docs/Session_Summary.md](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/Docs/Session_Summary.md) — Detailed summary of memory profiling, debugging sessions, and DMA2D performance optimizations.
