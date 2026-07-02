@@ -21,34 +21,21 @@ graph LR
 ## Step-by-Step Pipeline
 
 ### Step 1 — Design the UI in EEZ Studio
-1. Open your EEZ Studio project (e.g. `ui.eez`).
-2. Design screens, styles, widgets, themes, and animations.
-3. In EEZ Studio **Project Settings** (under the Code Generation settings tab):
-   - Set **Target** to `LVGL`.
-   - Set **LVGL Version** to `v8.3.11`.
-   - Set the **Output Directory** to a folder named `EEZ_Output` inside this project's root directory.
+1. Open the project inside **EEZ Studio** (located at [EEZ/Riverdi-template/Riverdi-template.eez-project](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/EEZ/Riverdi-template/Riverdi-template.eez-project)).
+2. In EEZ Studio **Project Settings** (under the General and Code Generation tabs):
+   - **Target**: `LVGL`
+   - **LVGL Version**: `8.3` (or `8.4`)
+   - **Output Directory**: Point it directly to `CM4/Core/Src/eez_ui` (configured as `../../CM4/Core/Src/eez_ui` in project settings).
 
 ### Step 2 — Generate Code from EEZ Studio
 1. Click **Generate Code** (or press `Ctrl+Shift+G` in EEZ Studio).
-2. EEZ Studio will write all `.c` and `.h` assets (ui screens, variables, custom fonts, images) into the `EEZ_Output/` directory.
+2. EEZ Studio will generate all `.c` and `.h` assets directly into [CM4/Core/Src/eez_ui](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/CM4/Core/Src/eez_ui).
 
-### Step 3 — Port Code to Firmware
-Run the porting script to transfer the files and automatically configure build paths:
-* **VS Code Task**: In VS Code Task Explorer, run the **`EEZ: Port UI Output`** task.
-* **CLI alternative**: Run the python script directly from the project root:
-  ```bash
-  python3 port_eez_ui.py
-  ```
-
-> [!NOTE]
-> **What this script does behind the scenes:**
-> 1. Clears `CM4/Core/Src/eez_ui/` and copies all generated `.c`/`.h` files flat.
-> 2. Regenerates `subdir.mk` with explicit GCC build rules for all copied files.
-> 3. Registers all object files dynamically in CM4's `objects.list`.
-> 4. Updates include paths in the `.project` and `.cproject` files so that the IDE automatically imports and compiles the new code.
-
-### Step 4 — Compile and Flash
+### Step 3 — Compile and Flash (Auto-Ported!)
+There is **no manual porting step** needed anymore!
 1. Run the **`Docker: Build CM4`** or **`Docker: Build All`** task.
+   > [!NOTE]
+   > The build system automatically detects the new files, updates the build makefiles, and compiles everything in a single step!
 2. Run the **`Flash: Both (CM7 then CM4 + reset)`** task to upload the updated firmware to the board.
 
 ---
