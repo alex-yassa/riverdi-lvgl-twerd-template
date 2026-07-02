@@ -19,7 +19,7 @@ graph TD
     
     subgraph Cortex-M4 [Cortex-M4 Core - 240 MHz]
         F[Wait for Release HSEM] --> G[Boot]
-        G --> H[I2C1 Touch & DMA2D Init]
+        G --> H[DMA2D Init]
         H --> I[LVGL Graphics Stack]
         I --> J[User Interface Loop]
     end
@@ -40,10 +40,9 @@ The CM7 acts as the master processor. Its primary duties include:
 ### Cortex-M4 (CM4) — Dedicated HMI Graphics
 The CM4 acts as a slave processor dedicated entirely to the user interface:
 - Booting up after receiving the wake-up signal from CM7.
-- Initializing touchscreen peripherals (I2C1 controller).
 - Initializing the **DMA2D (Chrom-ART)** graphics accelerator.
 - Initializing the **LVGL** graphical library, drawing a dark blue background with the centered label `"TWERD ENERGO-PLUS"`.
-- Running the UI refresh loop and handling touchscreen tap events.
+- Running the UI refresh loop.
 
 ---
 

@@ -11,7 +11,7 @@ The responsibilities of the dual cores are decoupled as follows:
 | Component | Core Responsibility | Allocation Details |
 |---|---|---|
 | **Cortex-M7** | System Master & Boot Loader | Configures Clocks, FMC (SDRAM), LTDC, DSI, then wakes up CM4. |
-| **Cortex-M4** | Graphic & HMI Host | Runs the LVGL engine, I2C1 Touch driver, and triggers DMA2D blitting. |
+| **Cortex-M4** | Graphic & HMI Host | Runs the LVGL engine and triggers DMA2D blitting (configured as a non-touch status display). |
 | **SRAM (Internal)** | LVGL Buffers | Dual 30KB draw buffers (`buf_1`, `buf_2`) allocated in CM4's internal RAM. |
 | **SDRAM (External)** | Framebuffer | Configured at `0xD0000000` (1024x600, ARGB8888). |
 

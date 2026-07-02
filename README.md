@@ -4,7 +4,7 @@ This repository is a premium, fully-decoupled **Dual-Core HMI template project**
 
 It decouples HMI rendering from main system tasks:
 - **Cortex-M7 (480 MHz)**: Reserved exclusively for calculations, RTOS scheduler, communications, and background control loops.
-- **Cortex-M4 (240 MHz)**: Dedicated entirely to visual rendering (LVGL graphics engine, DMA2D Chrom-ART acceleration, and touch panel polling).
+- **Cortex-M4 (240 MHz)**: Dedicated entirely to visual rendering (LVGL graphics engine and DMA2D Chrom-ART acceleration).
 
 ---
 
@@ -23,7 +23,7 @@ graph TD
     
     subgraph Cortex-M4 [Cortex-M4 Core - 240 MHz]
         F[Wait for Release HSEM] --> G[Boot]
-        G --> H[I2C1 Touch & DMA2D Init]
+        G --> H[DMA2D Init]
         H --> I[LVGL Graphics Stack]
         I --> J[User Interface Loop]
     end
@@ -31,8 +31,22 @@ graph TD
     E <--> |SRAM3 Shared Memory + HSEM| J
 ```
 
+### Cortex-M7 (CM7) — Calculations & Communications
+The CM7 acts as the master processor. Its primary duties include:
+- Configuring system clocks and power domains.
+- Initializing external hardware peripherals like **FMC (SDRAM)** and **LTDC (LCD controller)**.
+- Synchronizing the boot sequence: CM7 keeps CM4 in deep sleep, initializes external SDRAM, and then releases CM4 to prevent bus contentions.
+- Hosting **FreeRTOS** to handle real-time calculation loops, sensor telemetry, and industrial communication protocols (Modbus, FDCAN, SPI, USART).
+
+### Cortex-M4 (CM4) — Dedicated HMI Graphics
+The CM4 acts as a slave processor dedicated entirely to the user interface:
+- Booting up after receiving the wake-up signal from CM7.
+- Initializing the **DMA2D (Chrom-ART)** graphics accelerator.
+- Initializing the **LVGL** graphical library, drawing a dark blue background with the centered label `"TWERD ENERGO-PLUS"`.
+- Running the UI refresh loop.
+
 ### Inter-Processor Communication (IPC)
-* **Shared SRAM3 Memory (`0x30040000`)**: Memory block visible to both cores used to exchange telemetry (M7 $\rightarrow$ M4) and user events (M4 $\rightarrow$ M7). Defined in [Common/shared_memory.h](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/Common/shared_memory.h).
+* **Shared SRAM3 Memory (`0x30040000`)**: Memory block visible to both cores used to exchange telemetry (M7 $\rightarrow$ M4). Defined in [Common/shared_memory.h](file:///home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/Common/shared_memory.h).
 * **Hardware Semaphores (`HSEM`)**: Prevent read-write race conditions when both cores access the shared buffer (`HSEM_ID_SHARED_MEM` / Semaphore ID 1).
 
 ---
@@ -46,16 +60,15 @@ graph TD
 | **Flash** | 66 MB | 2 MB internal + 64 MB external QSPI flash |
 | **Graphics Accelerator** | Chrom-ART (DMA2D) | Used by CM4 for high-speed hardware-accelerated GUI blitting |
 | **Display Panel** | 7.0" IPS TFT LCD | Resolution: **1024x600**, 170 DPI, 24-bit color depth |
-| **Touch Pad** | Capacitive | Connected via I2C1 touch controller |
+| **Touch Pad** | None | This template is configured for non-touch display models |
 | **Interfaces** | Industrial standard | 2x CAN FD, RS485, RS232, USB, expansion headers |
 
 ### Supported Displays & Purchase Links
-* [RVT70HSSNWC00-B](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-optical-bonding-uxtouch-stm32h7-rvt70hssnwc00-b/) — *Capacitive Touch, Optical Bonding*
-* [RVT70HSSNWC00](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-uxtouch-stm32h7-rvt70hssnwc00/) — *Capacitive Touch, Air Bonding*
-* [RVT70HSSFWCA0](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-frame-stm32h7-rvt70hssfwca0/) — *Capacitive Touch with Frame, aTouch*
-* [RVT70HSSNWCA0](https://riverdi.com/product/7-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-stm32h7-rvt70hssnwca0/) — *Capacitive Touch, aTouch*
+This template is configured for the **non-touch panel display models**:
 * [RVT70HSSFWN00](https://riverdi.com/product/7-inch-lcd-display-stm32h7-frame-rvt70hssfwn00/) — *Non-touch panel with Frame*
 * [RVT70HSSNWN00](https://riverdi.com/product/7-inch-lcd-display-stm32h7-rvt70hssnwn00/) — *Non-touch panel*
+
+*(For reference, the touch model counterparts are the RVT70HSSNWC00-B, RVT70HSSNWC00, RVT70HSSFWCA0, and RVT70HSSNWCA0, but the touchscreen driver is disabled in this project configuration).*
 
 ---
 
