@@ -5,7 +5,7 @@ import shutil
 import glob
 
 # Constants
-PROJECT_ROOT = "/home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 TARGET_SRC_DIR = os.path.join(PROJECT_ROOT, "CM4/Core/Src/eez_ui")
 RELEASE_DIR = os.path.join(PROJECT_ROOT, "STM32CubeIDE/CM4/Release")
 SUBDIR_MK_PATH = os.path.join(RELEASE_DIR, "Application/User/Core/eez_ui/subdir.mk")

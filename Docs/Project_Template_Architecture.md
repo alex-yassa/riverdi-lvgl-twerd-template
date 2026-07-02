@@ -28,7 +28,7 @@ graph TD
 ```
 
 > [!TIP]
-> You can open the interactive architectural schema visually using the [Project_Template_Architecture.drawio](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/Docs/Project_Template_Architecture.drawio) file in Draw.io or using the VS Code Draw.io Integration extension.
+> You can open the interactive architectural schema visually using the [Project_Template_Architecture.drawio](Project_Template_Architecture.drawio) file in Draw.io or using the VS Code Draw.io Integration extension.
 
 ### Cortex-M7 (CM7) — Calculations & Communications
 The CM7 acts as the master processor. Its primary duties include:
@@ -86,7 +86,7 @@ Peripherals and memory regions are shared between both cores.
 ### Shared SRAM3 Memory
 To send calculations from CM7 to CM4 (and screen events from CM4 to CM7), we use **SRAM3 (D2 domain)** which is visible to both cores.
 * **Base Address**: `0x30040000`
-* **Buffer Definition**: Located in [Common/shared_memory.h](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/Common/shared_memory.h).
+* **Buffer Definition**: Located in [Common/shared_memory.h](../Common/shared_memory.h).
 
 ```c
 typedef struct {
@@ -118,7 +118,7 @@ if (HAL_HSEM_Take(HSEM_ID_SHARED_MEM, 0) == HAL_OK) {
 
 ## 4 — How to Build & Flash (Quick Guide)
 
-See [Docs/Build_and_Flash_CLI.md](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/Docs/Build_and_Flash_CLI.md) for full commands.
+See [Docs/Build_and_Flash_CLI.md](Build_and_Flash_CLI.md) for full commands.
 
 | Action | CLI Command | VS Code Task |
 |---|---|---|

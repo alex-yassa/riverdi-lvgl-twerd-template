@@ -21,7 +21,7 @@ graph LR
 ## Step-by-Step Pipeline
 
 ### Step 1 — Design the UI in EEZ Studio
-1. Open the project inside **EEZ Studio** (located at [EEZ/Riverdi-template/Riverdi-template.eez-project](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/EEZ/Riverdi-template/Riverdi-template.eez-project)).
+1. Open the project inside **EEZ Studio** (located at [EEZ/Riverdi-template/Riverdi-template.eez-project](../EEZ/Riverdi-template/Riverdi-template.eez-project)).
 2. In EEZ Studio **Project Settings** (under the General and Code Generation tabs):
    - **Target**: `LVGL`
    - **LVGL Version**: `8.3` (or `8.4`)
@@ -29,7 +29,7 @@ graph LR
 
 ### Step 2 — Generate Code from EEZ Studio
 1. Click **Generate Code** (or press `Ctrl+Shift+G` in EEZ Studio).
-2. EEZ Studio will generate all `.c` and `.h` assets directly into [CM4/Core/Src/eez_ui](file:///home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/CM4/Core/Src/eez_ui).
+2. EEZ Studio will generate all `.c` and `.h` assets directly into [CM4/Core/Src/eez_ui](../CM4/Core/Src/eez_ui).
 
 ### Step 3 — Compile and Flash (Auto-Ported!)
 There is **no manual porting step** needed anymore!

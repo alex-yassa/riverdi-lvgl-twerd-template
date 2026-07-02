@@ -39,7 +39,7 @@ docker compose run --rm builder
 ```bash
 ~/.local/share/stm32cube/bundles/programmer/2.22.0+st.1/bin/STM32_Programmer_CLI \
   -c port=SWD freq=4000 ap=0 reset=HWrst \
-  -d /home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.elf \
+  -d /home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.elf \
   -hardRst
 ```
 
@@ -47,7 +47,7 @@ docker compose run --rm builder
 ```bash
 ~/.local/share/stm32cube/bundles/programmer/2.22.0+st.1/bin/STM32_Programmer_CLI \
   -c port=SWD freq=4000 ap=3 reset=HWrst \
-  -d /home/alex/Documents/riverdi/LVGL_Demo_H7-H4_switch/lv_port_riverdi_70-stm32h7/STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.elf \
+  -d /home/alex/Documents/riverdi/RIVERDI_LVGL_TWERD_TEMPLATE/lv_port_riverdi_70-stm32h7/STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.elf \
   -hardRst
 ```
 
