@@ -59,3 +59,9 @@ Release/
 CM4/Core/Src/eez_ui/*
 !CM4/Core/Src/eez_ui/ui.c
 !CM4/Core/Src/eez_ui/ui.h
+
+# EEZ project editor state & build directories
+EEZ/**/*.eez-project-ui-state
+EEZ/**/src/
+build_workspace/
+Middlewares/Third_Party/LVGL_v9_backup/
