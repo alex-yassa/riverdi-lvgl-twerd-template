@@ -65,3 +65,6 @@ EEZ/**/*.eez-project-ui-state
 EEZ/**/src/
 build_workspace/
 Middlewares/Third_Party/LVGL_v9_backup/
+
+# OnlyOffice / LibreOffice lock files
+.~lock.*#
