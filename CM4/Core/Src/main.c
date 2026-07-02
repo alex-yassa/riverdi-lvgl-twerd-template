@@ -27,6 +27,7 @@
 #include "lvgl/lvgl.h"
 #include "porting/lv_port_disp.h"
 #include "lvgl_port_touch.h"
+#include "ui.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,15 +116,8 @@ int main(void)
   lv_port_disp_init();
   lvgl_touchscreen_init();
 
-  /* Create dark blue background and centered label with text 'TWERD ENERGO-PLUS' */
-  lv_obj_t * scr = lv_scr_act();
-  lv_obj_set_style_bg_color(scr, lv_color_hex(0x00003B), LV_PART_MAIN);
-  lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, LV_PART_MAIN);
-
-  lv_obj_t * label = lv_label_create(scr);
-  lv_label_set_text(label, "TWERD ENERGO-PLUS");
-  lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+  /* Initialize EEZ-generated UI */
+  ui_init();
 
   /* USER CODE END 2 */
 
@@ -133,6 +127,9 @@ int main(void)
   {
     /* Let LVGL process timer-driven widget rendering & interactions */
     lv_timer_handler();
+
+    /* Let EEZ UI process ticks and logical flows */
+    ui_tick();
 
     /* Increment the tick counter by 5ms */
     lv_tick_inc(5);

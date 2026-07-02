@@ -59,22 +59,22 @@ Connect the ST-LINK probe to the board's **SWD** header and power the board befo
 ### Flash CM7 only
 ```bash
 STM32_Programmer_CLI -c port=SWD \
-  -w STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.hex \
+  -w STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.elf \
   -rst
 ```
 
 ### Flash CM4 only
 ```bash
 STM32_Programmer_CLI -c port=SWD \
-  -w STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.hex \
+  -w STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.elf \
   -rst
 ```
 
 ### Flash both cores (single reset at the end)
 ```bash
 STM32_Programmer_CLI -c port=SWD \
-  -w STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.hex \
-  -w STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.hex \
+  -w STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.elf \
+  -w STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.elf \
   -rst
 ```
 
@@ -91,8 +91,8 @@ new firmware without needing a power cycle.
 ```bash
 docker compose run --rm builder make all && \
 STM32_Programmer_CLI -c port=SWD \
-  -w STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.hex \
-  -w STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.hex \
+  -w STM32CubeIDE/CM7/Release/riverdi-70-stm32h7-lvgl_CM7.elf \
+  -w STM32CubeIDE/CM4/Release/riverdi-70-stm32h7-lvgl_CM4.elf \
   -rst
 ```
 

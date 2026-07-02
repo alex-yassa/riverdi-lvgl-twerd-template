@@ -124,4 +124,4 @@ See [Docs/Build_and_Flash_CLI.md](file:///home/alex/Documents/riverdi/LVGL_Demo_
 |---|---|---|
 | **Clean All** | `docker compose run --rm builder make clean` | `Docker: Clean` |
 | **Compile All** | `docker compose run --rm builder make all` | `Docker: Build All (CM4 + CM7)` |
-| **Flash Board** | `STM32_Programmer_CLI -c port=SWD -w <hex_paths> -rst` | `Flash: Both (CM7 then CM4 + reset)` |
+| **Flash Board** | `STM32_Programmer_CLI -c port=SWD -w <binary_paths> -rst` | `Flash: Both (CM7 then CM4 + reset)` |
