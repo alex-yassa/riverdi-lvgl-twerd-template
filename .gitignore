@@ -54,3 +54,8 @@ dkms.conf
 Debug/
 Release/
 *.launch
+
+# EEZ UI generated assets
+CM4/Core/Src/eez_ui/*
+!CM4/Core/Src/eez_ui/ui.c
+!CM4/Core/Src/eez_ui/ui.h
